@@ -5,56 +5,90 @@
     1- https://media.giphy.com/media/A06UFEx8jxEwU/giphy.gif desfocado
     2-https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif  mais nítido
     3-https://media.giphy.com/media/CrfQXtyRnKFNu/giphy.gif  repete
+
+    a.botao{
+       background-color: #00cc00;
+       color: black;
+       border: 1px solid black;
+       padding: 10px 20px;
+       text-align: center;
+       text-decoration: none;
+       display: inline-block;
+     }
+     h2{
+       color: #90ff00;
+       font-size: 40px;
+       border: 2px solid black;
+       padding: 10px 20px;
+       background-color: black;
+     }
+     h3{
+       color: #abff00;
+       font-size: 20px;
+       border: 1px solid black;
+       padding: 10px 20px;
+       background-color: black;
+     }
+     body{
+       background-color: black;
+       background-image: url('https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif');
+     }
+     #33990D
   -->
     <meta charset="UTF-8">
     <title>API Senhas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
-      body{
-        background-color: black;
-        background-image: url('https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif');
-      }
-      h1{
-        color: #90ff00;
-        font-size: 50px;
-        border: 1px solid black;
-        padding: 10px 20px;
-        background-color: black;
-      }
-      h2{
-        color: #90ff00;
-        font-size: 40px;
-        border: 1px solid black;
-        padding: 10px 20px;
-        background-color: black;
-      }
-      h3{
-        color: #abff00;
-        font-size: 20px;
-        border: 1px solid black;
-        padding: 10px 20px;
-        background-color: black;
-      }
-      a{
-        background-color: #00cc00;
-        color: black;
-        border: 1px solid black;
-        padding: 10px 20px;
-        text-align: center;
-        text-decoration: none;
-        display: inline-block;
-      }
+     h2{
+       color: #33990D;
+       font-size: 40px;
+       border: 2px solid black;
+       padding: 10px 20px;
+       background-color: black;
+     }
+     h3{
+       color: #33990D;
+       font-size: 20px;
+       border: 1px solid black;
+       padding: 10px 20px;
+       background-color: black;
+     }
+     body{
+       background-color: black;
+       background-image: url('https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif');
+     }
     </style>
 </head>
 
 <body>
-  <h1 style="text-align: center">
-    Trabalho de Laboratório de Redes 2019/1 - API de Senhas
-  </h1>
-    <h2 style="text-align: center">Cheque a integridade de seus dados aqui!</h2>
-    <h3 style="text-align: center">Saiba se seus dados sofreram algum vazamento</h3>
-      <div style="text-align:center">
-        <a href="/passwordpage">SENHA</a>
-        <a href="/emailpage">EMAIL</a>
+  <nav class="navbar navbar-expand-lg navbar-light" style="background-color: black">
+  <a class="navbar-brand" href="/" style="color:#33990D">API de Senhas</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+    </ul>
+    <a class="navbar-brand" href="/" style="color:#33990D">Trabalho de Laboratório de Redes 2019/1</a>
+  </div>
+</nav>
+    <h2 style="text-align: center">Cheque a integridade de seus dados aqui</h2>
+  <!--  <h3 style="text-align: center">Saiba se seus dados sofreram algum vazamento</h3> -->
+      </div>
+      <div class="container">
+        <div class="row">
+          <div class="col-sm">
+            <li style="text-align: center">
+              <h1><a href="/passwordpage" class="badge badge-success">SENHA</a></h1>
+            </li>
+          </div>
+          <div class="col-sm">
+            <li style="text-align:center">
+              <h1><a href="/emailpage" class="badge badge-success">EMAIL</a></h1>
+            </li>
+          </div>
+        </div>
       </div>
 </body>
 
