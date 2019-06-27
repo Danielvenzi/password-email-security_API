@@ -23,7 +23,7 @@
        background-color: black;
      }
      h3{
-       color: #abff00;
+       color: #33990D;
        font-size: 20px;
        border: 1px solid black;
        padding: 10px 20px;
@@ -39,57 +39,67 @@
     <title>API Senhas</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <style>
-     h2{
-       color: #33990D;
-       font-size: 40px;
-       border: 2px solid black;
-       padding: 10px 20px;
-       background-color: black;
-     }
-     h3{
+  /*   h3{
        color: #33990D;
        font-size: 20px;
        border: 1px solid black;
        padding: 10px 20px;
-       background-color: black;
+       /*background-color: black;*/
+     }
+     hr{
+       background-color: black
      }
      body{
        background-color: black;
        background-image: url('https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif');
      }
+     .card {
+        margin: 0 auto;
+        float: none;
+        margin-bottom: 10px;
+      }
     </style>
 </head>
 
 <body>
   <nav class="navbar navbar-expand-lg navbar-light" style="background-color: black">
-  <a class="navbar-brand" href="/" style="color:#33990D">API de Senhas</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-    </ul>
-    <a class="navbar-brand" href="/" style="color:#33990D">Trabalho de Laboratório de Redes 2019/1</a>
-  </div>
-</nav>
-    <h2 style="text-align: center">Cheque a integridade de seus dados aqui</h2>
-  <!--  <h3 style="text-align: center">Saiba se seus dados sofreram algum vazamento</h3> -->
-      </div>
-      <div class="container">
-        <div class="row">
-          <div class="col-sm">
-            <li style="text-align: center">
-              <h1><a href="/passwordpage" class="badge badge-success">SENHA</a></h1>
-            </li>
-          </div>
-          <div class="col-sm">
-            <li style="text-align:center">
-              <h1><a href="/emailpage" class="badge badge-success">EMAIL</a></h1>
-            </li>
+    <a class="navbar-brand" href="/" style="color:#33990D">API de Senhas</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto"></ul>
+      <a class="navbar-brand" href="/" style="color:#33990D">Trabalho de Laboratório de Redes 2019/1</a>
+    </div>
+  </nav>
+  <div class="container-fluid text-center">
+    <div class="row content">
+      <div class="col-sm-2 sidenav"></div>
+      <div class="col-sm-8 text-left">
+        <h1></h1>
+        <p></p>
+        <hr>
+        <div class="card text-center" style="width: 450px;background-color: black; margin-top: 150px;float: none;margin-bottom: 10px;">
+          <div class="card-body">
+            <h1 class="card-title" style="color: #33990D">Cheque a integridade de seus dados</h1>
+            <p class="card-text"></p>
+            <h3><a href="/passwordpage" class="badge" style="color:black;background-color:#33990D">SENHA</a>
+            <a href="/emailpage" class="badge" style="color:black;background-color:#33990D">EMAIL</a></h3>
           </div>
         </div>
       </div>
+      <div class="col-sm-4 sidenav">
+        <div class="well">
+          <p></p>
+        </div>
+        <div class="well">
+          <p></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
 </body>
 
 </html>
