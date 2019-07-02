@@ -173,4 +173,4 @@ def email():
 if __name__ == "__main__":
     host = "127.0.0.1"
     port = 8080
-    app.run(debug=True, host=host, port=port, use_reloader=True)
+    app.run(debug=True, host=host, port=port, use_reloader=True, ssl_context=('certificate/cert.pem','certificate/key.pem'))
