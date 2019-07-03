@@ -235,9 +235,7 @@ def email():
 @app.route('/report',methods=['POST'])
 def generate_report():
 
-    print("Chegou aqui")
     template_json = request.get_json(force=True)
-    print(template_json)
 
 #     template_json = {
 #   "Email": "franciscolopescaldas@gmail.com", 
