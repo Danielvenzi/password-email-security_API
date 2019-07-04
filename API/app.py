@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, url_for, render_template, send_file
+from flask import Flask, request, jsonify, redirect, url_for, render_template, send_file, render_template_string
 import requests
 import hashlib
 import sys
@@ -7,6 +7,9 @@ import random
 import os
 from fpdf import FPDF
 import shutil
+from json2html import *
+import json
+import json2table
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -22,7 +25,7 @@ def generate_safe_pass(password):
     password_count = 0
     for i in range(1,25*len(password)-1):
         rand_int = random.randint(1,5)
-        if rand_int == 1 and special_count == 0:    
+        if rand_int == 1 and special_count == 0:
             new_password += special_chars[random.randint(0,len(special_chars)-1)]
             special_count += 1
             master_special_count += 1
@@ -37,13 +40,13 @@ def generate_safe_pass(password):
             except IndexError:
                 special_count = 0
                 if len(new_password) >= 2*len(password) and master_special_count > 2:
-                    
+
                     is_breached = check_new(new_password)
                     if is_breached == 1:
                         generate_safe_pass(password)
                     elif is_breached == -1:
                         new_password = 'None'
-                    
+
                     return new_password
 
 def check_new(new_password):
@@ -74,8 +77,8 @@ def check_new(new_password):
                 return 1
 
         return 0
-        
-    
+
+
     except requests.exceptions.ConnectTimeout:
         return -1
     except requests.exceptions.ConnectionError:
@@ -85,7 +88,7 @@ def check_new(new_password):
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-# ------------------------------------------------------- Formatação do PDF -----------------------------------------------------------------------# 
+# ------------------------------------------------------- Formatação do PDF -----------------------------------------------------------------------#
 
 from fpdf import FPDF
 
@@ -122,14 +125,14 @@ def download_image(url, file_name):
         status_code = r.status_code
         if status_code != 200:
             return jsonify({"Response":"Error","Status":status_code})
-        
+
         if r.headers.get('content-type') == "image/png":
             with open('./breached_images/'+file_name, 'wb') as out_file:
                 shutil.copyfileobj(r.raw, out_file)
             del r
         else:
             os.system("cp ./error/error.jpeg ./breached_images/{}".format(file_name))
-        
+
     except requests.exceptions.ConnectTimeout:
         os.system("cp ./error/error.jpeg ./breached_images/{}".format(file_name))
     except requests.exceptions.ConnectionError:
@@ -181,13 +184,13 @@ def password():
             # Se os caracteres restantes da senha sha1 forem iguais ao elemento de resposta coloque o count associado a esse hash
             if sha1_tail == hash[0]:
                 count = hash[1]
-        
+
         if count != 0:
             new_passwd = generate_safe_pass(password)
             return jsonify({"Status":status_code,"Resposta":"Sua senha foi encontrada {} vezes nas bases de dados vazadas.".format(count),"Senha recomendada (não vazada)":new_passwd})
-        
+
         return jsonify({"Status":status_code,"Resposta":"Sua senha foi encontrada {} vezes nas bases de dados vazadas.".format(count)})
-    
+
     except requests.exceptions.ConnectTimeout:
         return jsonify({"Error":"Tempo de conexão excedida com: {}".format(url)})
     except requests.exceptions.ConnectionError:
@@ -213,15 +216,26 @@ def email():
 
         status_code = r.status_code
         if status_code != 200:
-            return jsonify({"Response":"Error","Status":status_code})
+            return render_template("email_response_ok.html")
+            #return jsonify({"Response":"Error","Status":status_code})
 
         #response_data = r.headers['content-type']#list(r.text)
         response_data = r.json()
 
-        #print(response_data.encode('UTF-8'))
-        #return jsonify("Status":status_code,"Resposta":"")
-        return jsonify({"Response":response_data,"Email":email}),200
-        
+        outPut = jsonify({"Response":response_data,"Email":email}),200
+        #html = "<style> hr{background-color: black}body{background-color: black;background-image: url('https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif');}.card {margin: 0 auto;float: none;margin-bottom: 10px;}</style><body><script></script></body>"
+
+        #return
+
+        return render_template("email_response_data.html"),email
+
+        #info = r.text
+
+        #return info
+
+        #return html
+        #return outPut
+
 
 
     except requests.exceptions.ConnectTimeout:
@@ -231,121 +245,167 @@ def email():
     except requests.exceptions.SSLError:
         return jsonify({"Error":"Erro de conexão SSL com: {}".format(url)})
 
+def get_email(email):
+    return email
 
 @app.route('/report',methods=['POST'])
 def generate_report():
+    false = 0
+    true = 1
+#    email = request.form['email']
+#    url = "https://haveibeenpwned.com/api/v2/breachedaccount/"+email
+#    r = requests.get(url)
+#    response_data = r.json()
+    #template_json=jsonify({"Response":response_data,"Email":email}),200
+    #template_json = request.get_json(force=True)
+    template_json = {
+      "Email": "brunojustin@gmail.com",
+      "Response": [
+        {
+          "AddedDate": "2019-02-25T08:35:58Z",
+          "BreachDate": "2018-12-01",
+          "DataClasses": [
+            "Email addresses",
+            "Geographic locations",
+            "Names",
+            "Passwords",
+            "Phone numbers",
+            "Spoken languages",
+            "Usernames"
+          ],
+          "Description": "In December 2018, the video messaging service <a href=\"https://www.theregister.co.uk/2019/02/11/620_million_hacked_accounts_dark_web/\" target=\"_blank\" rel=\"noopener\">Dubsmash suffered a data breach</a>. The incident exposed 162 million unique email addresses alongside usernames and PBKDF2 password hashes. In 2019, the data appeared listed for sale on a dark web marketplace (along with several other large breaches) and subsequently began circulating more broadly. The data was provided to HIBP by a source who requested it to be attributed to &quot;BenjaminBlue@exploit.im&quot;.",
+          "Domain": "dubsmash.com",
+          "IsFabricated": false,
+          "IsRetired": false,
+          "IsSensitive": false,
+          "IsSpamList": false,
+          "IsVerified": true,
+          "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/Dubsmash.png",
+          "ModifiedDate": "2019-02-25T08:35:58Z",
+          "Name": "Dubsmash",
+          "PwnCount": 161749950,
+          "Title": "Dubsmash"
+        }
+      ]
+    }
+#    template_json=jsonify({"Response":response_data,"Email":email}),200
 
-    template_json = request.get_json(force=True)
+    r = requests.post('https://127.0.0.1:8080/report',data=json.dumps(template_json, ensure_ascii=False),verify=False)
+    with open('./metadata.pdf', 'wb') as f:
+        print(r.content)
+        f.write(r.content)
+
+    #template_json = request.get_json(force=True)
 
 #     template_json = {
-#   "Email": "franciscolopescaldas@gmail.com", 
+#   "Email": "franciscolopescaldas@gmail.com",
 #   "Response": [
 #     {
-#       "AddedDate": "2016-08-31T00:19:19Z", 
-#       "BreachDate": "2012-07-01", 
+#       "AddedDate": "2016-08-31T00:19:19Z",
+#       "BreachDate": "2012-07-01",
 #       "DataClasses": [
-#         "Email addresses", 
+#         "Email addresses",
 #         "Passwords"
-#       ], 
-#       "Description": "In mid-2012, Dropbox suffered a data breach which exposed the stored credentials of tens of millions of their customers. In August 2016, <a href=\"https://motherboard.vice.com/read/dropbox-forces-password-resets-after-user-credentials-exposed\" target=\"_blank\" rel=\"noopener\">they forced password resets for customers they believed may be at risk</a>. A large volume of data totalling over 68 million records <a href=\"https://motherboard.vice.com/read/hackers-stole-over-60-million-dropbox-accounts\" target=\"_blank\" rel=\"noopener\">was subsequently traded online</a> and included email addresses and salted hashes of passwords (half of them SHA1, half of them bcrypt).", 
-#       "Domain": "dropbox.com", 
-#       "IsFabricated": "false", 
-#       "IsRetired": "false", 
-#       "IsSensitive": "false", 
-#       "IsSpamList": "false", 
-#       "IsVerified": "true", 
-#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/Dropbox.png", 
-#       "ModifiedDate": "2016-08-31T00:19:19Z", 
-#       "Name": "Dropbox", 
-#       "PwnCount": 68648009, 
+#       ],
+#       "Description": "In mid-2012, Dropbox suffered a data breach which exposed the stored credentials of tens of millions of their customers. In August 2016, <a href=\"https://motherboard.vice.com/read/dropbox-forces-password-resets-after-user-credentials-exposed\" target=\"_blank\" rel=\"noopener\">they forced password resets for customers they believed may be at risk</a>. A large volume of data totalling over 68 million records <a href=\"https://motherboard.vice.com/read/hackers-stole-over-60-million-dropbox-accounts\" target=\"_blank\" rel=\"noopener\">was subsequently traded online</a> and included email addresses and salted hashes of passwords (half of them SHA1, half of them bcrypt).",
+#       "Domain": "dropbox.com",
+#       "IsFabricated": "false",
+#       "IsRetired": "false",
+#       "IsSensitive": "false",
+#       "IsSpamList": "false",
+#       "IsVerified": "true",
+#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/Dropbox.png",
+#       "ModifiedDate": "2016-08-31T00:19:19Z",
+#       "Name": "Dropbox",
+#       "PwnCount": 68648009,
 #       "Title": "Dropbox"
-#     }, 
+#     },
 #     {
-#       "AddedDate": "2016-09-20T20:00:49Z", 
-#       "BreachDate": "2012-03-22", 
+#       "AddedDate": "2016-09-20T20:00:49Z",
+#       "BreachDate": "2012-03-22",
 #       "DataClasses": [
-#         "Email addresses", 
-#         "Passwords", 
-#         "Usernames", 
+#         "Email addresses",
+#         "Passwords",
+#         "Usernames",
 #         "Website activity"
-#       ], 
-#       "Description": "In March 2012, the music website <a href=\"https://techcrunch.com/2016/09/01/43-million-passwords-hacked-in-last-fm-breach/\" target=\"_blank\" rel=\"noopener\">Last.fm was hacked</a> and 43 million user accounts were exposed. Whilst <a href=\"http://www.last.fm/passwordsecurity\" target=\"_blank\" rel=\"noopener\">Last.fm knew of an incident back in 2012</a>, the scale of the hack was not known until the data was released publicly in September 2016. The breach included 37 million unique email addresses, usernames and passwords stored as unsalted MD5 hashes.", 
-#       "Domain": "last.fm", 
-#       "IsFabricated": "false", 
-#       "IsRetired": "false", 
-#       "IsSensitive": "false", 
-#       "IsSpamList": "false", 
-#       "IsVerified": "true", 
-#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/Lastfm.png", 
-#       "ModifiedDate": "2016-09-20T20:00:49Z", 
-#       "Name": "Lastfm", 
-#       "PwnCount": 37217682, 
+#       ],
+#       "Description": "In March 2012, the music website <a href=\"https://techcrunch.com/2016/09/01/43-million-passwords-hacked-in-last-fm-breach/\" target=\"_blank\" rel=\"noopener\">Last.fm was hacked</a> and 43 million user accounts were exposed. Whilst <a href=\"http://www.last.fm/passwordsecurity\" target=\"_blank\" rel=\"noopener\">Last.fm knew of an incident back in 2012</a>, the scale of the hack was not known until the data was released publicly in September 2016. The breach included 37 million unique email addresses, usernames and passwords stored as unsalted MD5 hashes.",
+#       "Domain": "last.fm",
+#       "IsFabricated": "false",
+#       "IsRetired": "false",
+#       "IsSensitive": "false",
+#       "IsSpamList": "false",
+#       "IsVerified": "true",
+#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/Lastfm.png",
+#       "ModifiedDate": "2016-09-20T20:00:49Z",
+#       "Name": "Lastfm",
+#       "PwnCount": 37217682,
 #       "Title": "Last.fm"
-#     }, 
+#     },
 #     {
-#       "AddedDate": "2016-05-21T21:35:40Z", 
-#       "BreachDate": "2012-05-05", 
+#       "AddedDate": "2016-05-21T21:35:40Z",
+#       "BreachDate": "2012-05-05",
 #       "DataClasses": [
-#         "Email addresses", 
+#         "Email addresses",
 #         "Passwords"
-#       ], 
-#       "Description": "In May 2016, <a href=\"https://www.troyhunt.com/observations-and-thoughts-on-the-linkedin-data-breach\" target=\"_blank\" rel=\"noopener\">LinkedIn had 164 million email addresses and passwords exposed</a>. Originally hacked in 2012, the data remained out of sight until being offered for sale on a dark market site 4 years later. The passwords in the breach were stored as SHA1 hashes without salt, the vast majority of which were quickly cracked in the days following the release of the data.", 
-#       "Domain": "linkedin.com", 
-#       "IsFabricated": "false", 
-#       "IsRetired": "false", 
-#       "IsSensitive": "false", 
-#       "IsSpamList": "false", 
-#       "IsVerified": "true", 
-#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/LinkedIn.png", 
-#       "ModifiedDate": "2016-05-21T21:35:40Z", 
-#       "Name": "LinkedIn", 
-#       "PwnCount": 164611595, 
+#       ],
+#       "Description": "In May 2016, <a href=\"https://www.troyhunt.com/observations-and-thoughts-on-the-linkedin-data-breach\" target=\"_blank\" rel=\"noopener\">LinkedIn had 164 million email addresses and passwords exposed</a>. Originally hacked in 2012, the data remained out of sight until being offered for sale on a dark market site 4 years later. The passwords in the breach were stored as SHA1 hashes without salt, the vast majority of which were quickly cracked in the days following the release of the data.",
+#       "Domain": "linkedin.com",
+#       "IsFabricated": "false",
+#       "IsRetired": "false",
+#       "IsSensitive": "false",
+#       "IsSpamList": "false",
+#       "IsVerified": "true",
+#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/LinkedIn.png",
+#       "ModifiedDate": "2016-05-21T21:35:40Z",
+#       "Name": "LinkedIn",
+#       "PwnCount": 164611595,
 #       "Title": "LinkedIn"
-#     }, 
+#     },
 #     {
-#       "AddedDate": "2016-10-12T09:09:11Z", 
-#       "BreachDate": "2016-10-08", 
+#       "AddedDate": "2016-10-12T09:09:11Z",
+#       "BreachDate": "2016-10-08",
 #       "DataClasses": [
-#         "Dates of birth", 
-#         "Email addresses", 
-#         "Genders", 
-#         "IP addresses", 
-#         "Job titles", 
-#         "Names", 
-#         "Phone numbers", 
+#         "Dates of birth",
+#         "Email addresses",
+#         "Genders",
+#         "IP addresses",
+#         "Job titles",
+#         "Names",
+#         "Phone numbers",
 #         "Physical addresses"
-#       ], 
-#       "Description": "In October 2016, a large Mongo DB file containing tens of millions of accounts <a href=\"https://twitter.com/0x2Taylor/status/784544208879292417\" target=\"_blank\" rel=\"noopener\">was shared publicly on Twitter</a> (the file has since been removed). The database contained over 58M unique email addresses along with IP addresses, names, home addresses, genders, job titles, dates of birth and phone numbers. The data was subsequently <a href=\"http://news.softpedia.com/news/hacker-steals-58-million-user-records-from-data-storage-provider-509190.shtml\" target=\"_blank\" rel=\"noopener\">attributed to &quot;Modern Business Solutions&quot;</a>, a company that provides data storage and database hosting solutions. They've yet to acknowledge the incident or explain how they came to be in possession of the data.", 
-#       "Domain": "modbsolutions.com", 
-#       "IsFabricated": "false", 
-#       "IsRetired": "false", 
-#       "IsSensitive": "false", 
-#       "IsSpamList": "false", 
-#       "IsVerified": "true", 
-#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/ModernBusinessSolutions.png", 
-#       "ModifiedDate": "2016-10-12T09:09:11Z", 
-#       "Name": "ModernBusinessSolutions", 
-#       "PwnCount": 58843488, 
+#       ],
+#       "Description": "In October 2016, a large Mongo DB file containing tens of millions of accounts <a href=\"https://twitter.com/0x2Taylor/status/784544208879292417\" target=\"_blank\" rel=\"noopener\">was shared publicly on Twitter</a> (the file has since been removed). The database contained over 58M unique email addresses along with IP addresses, names, home addresses, genders, job titles, dates of birth and phone numbers. The data was subsequently <a href=\"http://news.softpedia.com/news/hacker-steals-58-million-user-records-from-data-storage-provider-509190.shtml\" target=\"_blank\" rel=\"noopener\">attributed to &quot;Modern Business Solutions&quot;</a>, a company that provides data storage and database hosting solutions. They've yet to acknowledge the incident or explain how they came to be in possession of the data.",
+#       "Domain": "modbsolutions.com",
+#       "IsFabricated": "false",
+#       "IsRetired": "false",
+#       "IsSensitive": "false",
+#       "IsSpamList": "false",
+#       "IsVerified": "true",
+#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/ModernBusinessSolutions.png",
+#       "ModifiedDate": "2016-10-12T09:09:11Z",
+#       "Name": "ModernBusinessSolutions",
+#       "PwnCount": 58843488,
 #       "Title": "Modern Business Solutions"
-#     }, 
+#     },
 #     {
-#       "AddedDate": "2019-02-20T21:04:04Z", 
-#       "BreachDate": "2017-10-26", 
+#       "AddedDate": "2019-02-20T21:04:04Z",
+#       "BreachDate": "2017-10-26",
 #       "DataClasses": [
-#         "Email addresses", 
+#         "Email addresses",
 #         "Passwords"
-#       ], 
-#       "Description": "In October 2017, the genealogy website <a href=\"https://blog.myheritage.com/2018/06/myheritage-statement-about-a-cybersecurity-incident/\" target=\"_blank\" rel=\"noopener\">MyHeritage suffered a data breach</a>. The incident was reported 7 months later after a security researcher discovered the data and contacted MyHeritage. In total, more than 92M customer records were exposed and included email addresses and salted SHA-1 password hashes. In 2019, <a href=\"https://www.theregister.co.uk/2019/02/11/620_million_hacked_accounts_dark_web/\" target=\"_blank\" rel=\"noopener\">the data appeared listed for sale on a dark web marketplace</a> (along with several other large breaches) and subsequently began circulating more broadly. The data was provided to HIBP by a source who requested it be attributed to &quot;BenjaminBlue@exploit.im&quot;.", 
-#       "Domain": "myheritage.com", 
-#       "IsFabricated": "false", 
-#       "IsRetired": "false", 
-#       "IsSensitive": "false", 
-#       "IsSpamList": "false", 
-#       "IsVerified": "true", 
-#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/MyHeritage.png", 
-#       "ModifiedDate": "2019-02-20T21:04:04Z", 
-#       "Name": "MyHeritage", 
-#       "PwnCount": 91991358, 
+#       ],
+#       "Description": "In October 2017, the genealogy website <a href=\"https://blog.myheritage.com/2018/06/myheritage-statement-about-a-cybersecurity-incident/\" target=\"_blank\" rel=\"noopener\">MyHeritage suffered a data breach</a>. The incident was reported 7 months later after a security researcher discovered the data and contacted MyHeritage. In total, more than 92M customer records were exposed and included email addresses and salted SHA-1 password hashes. In 2019, <a href=\"https://www.theregister.co.uk/2019/02/11/620_million_hacked_accounts_dark_web/\" target=\"_blank\" rel=\"noopener\">the data appeared listed for sale on a dark web marketplace</a> (along with several other large breaches) and subsequently began circulating more broadly. The data was provided to HIBP by a source who requested it be attributed to &quot;BenjaminBlue@exploit.im&quot;.",
+#       "Domain": "myheritage.com",
+#       "IsFabricated": "false",
+#       "IsRetired": "false",
+#       "IsSensitive": "false",
+#       "IsSpamList": "false",
+#       "IsVerified": "true",
+#       "LogoPath": "https://haveibeenpwned.com/Content/Images/PwnedLogos/MyHeritage.png",
+#       "ModifiedDate": "2019-02-20T21:04:04Z",
+#       "Name": "MyHeritage",
+#       "PwnCount": 91991358,
 #       "Title": "MyHeritage"
 #     }
 #   ]
@@ -353,7 +413,7 @@ def generate_report():
 
 
     os.system("rm -f ./report.pdf")
-    pdf = PDF() 
+    pdf = PDF()
     pdf.alias_nb_pages()
     pdf.add_page()
     pdf.set_font('Times', '', 8)
