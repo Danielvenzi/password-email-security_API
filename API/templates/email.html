@@ -2,7 +2,7 @@
 <html>
 <head>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-  
+
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i" crossorigin="anonymous"></script>
 
@@ -66,6 +66,9 @@
         alert("O valor passado no campo não é um email!");
         return false;
       }
+      else{
+        document.getElementById("campo").style = "width: 450px;background-color: black; margin-top: 50px;float: none;margin-bottom: 10px;"
+      }
       }
     </script>
 
@@ -90,11 +93,11 @@
         <h1></h1>
         <p></p>
         <hr>
-        <div class="card text-center" style="width: 450px;background-color: black; margin-top: 200px;float: none;margin-bottom: 10px;">
+        <div id="campo" class="card text-center" style="width: 450px;background-color: black; margin-top: 200px;float: none;margin-bottom: 10px;">
           <div class="card-body">
             <h1 class="card-title" style="color: #33990D">Digite seu email:</h1>
             <p class="card-text"></p>
-            <form id="email_form" name="email_input" action="/email" method="POST" onsubmit="return validateForm()">  
+            <form id="email_form" name="email_input" action="/email" method="POST" onsubmit="return validateForm()">
                 <input id="email_value" placeholder="exemplo@exemplo.com" class="form-control" type="text" name="email" value=""><br>
                 <input onclick="return validateForm()" id="email_button" action="/email" class="form-control btn btn-default" style="color:black;background-color:#33990D" type="submit" value="Enviar">
             </form>
@@ -122,7 +125,7 @@
       var responseLength = data.Response.length;
       for (var i = 0; i < responseLength; i++) {
         console.log(data.Response[i]);
-      }      
+      }
     });
 
   });
@@ -140,7 +143,7 @@
       var responseLength = data.Response.length;
       for (var i = 0; i < responseLength; i++) {
         console.log(data.Response[i]);
-      }      
+      }
     });
 
   });
