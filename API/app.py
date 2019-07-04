@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, redirect, url_for, render_template, send_file
+from flask import Flask, request, jsonify, redirect, url_for, render_template, send_file, render_template_string
 import requests
 import hashlib
 import sys
@@ -7,6 +7,8 @@ import random
 import os
 from fpdf import FPDF
 import shutil
+import json
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -22,7 +24,7 @@ def generate_safe_pass(password):
     password_count = 0
     for i in range(1,25*len(password)-1):
         rand_int = random.randint(1,5)
-        if rand_int == 1 and special_count == 0:    
+        if rand_int == 1 and special_count == 0:
             new_password += special_chars[random.randint(0,len(special_chars)-1)]
             special_count += 1
             master_special_count += 1
@@ -37,13 +39,13 @@ def generate_safe_pass(password):
             except IndexError:
                 special_count = 0
                 if len(new_password) >= 2*len(password) and master_special_count > 2:
-                    
+
                     is_breached = check_new(new_password)
                     if is_breached == 1:
                         generate_safe_pass(password)
                     elif is_breached == -1:
                         new_password = 'None'
-                    
+
                     return new_password
 
 def check_new(new_password):
@@ -74,8 +76,8 @@ def check_new(new_password):
                 return 1
 
         return 0
-        
-    
+
+
     except requests.exceptions.ConnectTimeout:
         return -1
     except requests.exceptions.ConnectionError:
@@ -85,7 +87,7 @@ def check_new(new_password):
 
 # ------------------------------------------------------------------------------------------------------------------------------------------------- #
 
-# ------------------------------------------------------- Formatação do PDF -----------------------------------------------------------------------# 
+# ------------------------------------------------------- Formatação do PDF -----------------------------------------------------------------------#
 
 from fpdf import FPDF
 
@@ -122,14 +124,14 @@ def download_image(url, file_name):
         status_code = r.status_code
         if status_code != 200:
             return jsonify({"Response":"Error","Status":status_code})
-        
+
         if r.headers.get('content-type') == "image/png":
             with open('./breached_images/'+file_name, 'wb') as out_file:
                 shutil.copyfileobj(r.raw, out_file)
             del r
         else:
             os.system("cp ./error/error.jpeg ./breached_images/{}".format(file_name))
-        
+
     except requests.exceptions.ConnectTimeout:
         os.system("cp ./error/error.jpeg ./breached_images/{}".format(file_name))
     except requests.exceptions.ConnectionError:
@@ -181,13 +183,13 @@ def password():
             # Se os caracteres restantes da senha sha1 forem iguais ao elemento de resposta coloque o count associado a esse hash
             if sha1_tail == hash[0]:
                 count = hash[1]
-        
+
         if count != 0:
             new_passwd = generate_safe_pass(password)
             return jsonify({"Status":status_code,"Resposta":"Sua senha foi encontrada {} vezes nas bases de dados vazadas.".format(count),"Senha recomendada":new_passwd})
         
         return jsonify({"Status":status_code,"Resposta":"Sua senha foi encontrada {} vezes nas bases de dados vazadas.".format(count)})
-    
+
     except requests.exceptions.ConnectTimeout:
         return jsonify({"Error":"Tempo de conexão excedida com: {}".format(url)})
     except requests.exceptions.ConnectionError:
@@ -213,16 +215,25 @@ def email():
 
         status_code = r.status_code
         if status_code != 200:
+            #return render_template("email_response_ok.html")
             return jsonify({"Response":"Error","Status":status_code})
 
         #response_data = r.headers['content-type']#list(r.text)
         response_data = r.json()
 
-        #print(response_data.encode('UTF-8'))
-        #return jsonify("Status":status_code,"Resposta":"")
-        return jsonify({"Response":response_data,"Email":email}),200
-        
+        outPut = jsonify({"Response":response_data,"Email":email}),200
+        #html = "<style> hr{background-color: black}body{background-color: black;background-image: url('https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif');}.card {margin: 0 auto;float: none;margin-bottom: 10px;}</style><body><script></script></body>"
 
+        #return
+
+        #return render_template("email_response_data.html"),email
+
+        #info = r.text
+
+        #return info
+
+        #return html
+        return outPut
 
     except requests.exceptions.ConnectTimeout:
         return jsonify({"Error":"Tempo de conexão excedida com: {}".format(url)})
@@ -231,6 +242,8 @@ def email():
     except requests.exceptions.SSLError:
         return jsonify({"Error":"Erro de conexão SSL com: {}".format(url)})
 
+def get_email(email):
+    return email
 
 @app.route('/report',methods=['GET'])
 def generate_report():
@@ -353,7 +366,7 @@ def generate_report():
 
 
     os.system("rm -f ./report.pdf")
-    pdf = PDF() 
+    pdf = PDF()
     pdf.alias_nb_pages()
     pdf.add_page()
     pdf.set_font('Times', '', 8)
