@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i" crossorigin="anonymous"></script> -->
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.2.2/jquery.form.min.js" integrity="sha384-FzT3vTVGXqf7wRfy8k4BiyzvbNfeYjK+frTVqZeNDFl8woCbF0CYG6g2fMEFFo/i" crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/bootstrap-table.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
     <meta charset="UTF-8">
     <title>API Senhas</title>
     <style>
@@ -105,30 +113,72 @@
         </div>
       </div>
       <div class="col-sm-2 sidenav">
-        <div class="well">
-          <p></p>
-        </div>
-        <div class="well">
-          <p></p>
-        </div>
+          <div class="container" style="background-color: black">
+              <div id="email_table" class="container" style="display:none">
+                  <table class="table" id="email-table" data-height="460">
+                  <thead>
+                      <tr>
+                          <th data-field="Name">Nome</th>
+                          <th data-field="Domain">Nome do Domínio</th>
+                          <th data-field="BreachDate">Data de Vazamento</th>
+                          <th data-field="DataClasses">Dados Vazados</th>
+                          <th data-field="Description">Descrição</th>
+                      </tr>
+                  </thead>
+                  </table>
+              </div>
+          </div>
       </div>
     </div>
   </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/bootstrap-table@1.15.2/dist/bootstrap-table.min.js"></script>
+
 </body>
 
 <!-- Script de ajax para submeter email via enter -->
 <script type='text/javascript'>
+  var $table = $('#email-table');
   $("#email_form").submit(function(event) {
     event.preventDefault();
 
     var $form = $( this ),
           url = $form.attr( 'action' );
 
+    var newData = [];
     $.post( url, {email: $('#email_value').val()}, function( data ) {
       var responseLength = data.Response.length;
       for (var i = 0; i < responseLength; i++) {
-        console.log(data.Response[i]);
+        var myDataClasses = "";
+        var classesLenght = data.Response[i].DataClasses.length;
+        for(var j =0; j < classesLenght;j++)
+        {
+          if(j == (classesLenght-1))
+          {
+            myDataClasses += data.Response[i].DataClasses[j];
+          }
+          else
+          {
+            myDataClasses += data.Response[i].DataClasses[j]+", ";
+          }
+        }
+        newData.push({"Name":data.Response[i].Name,"Domain":data.Response[i].Domain,"BreachDate":data.Response[i].BreachDate,"DataClasses":myDataClasses,"Description":data.Response[i].Description})
       }
+
+      var element = document.getElementById("email_table");
+      if(element.style.display == "none")
+      {
+        document.getElementById("email_table").style.display = "block";
+        $table.bootstrapTable({data:newData});
+      }
+      else{
+        console.log("não ta invisivel");
+        $table.closest('tr').remove();
+        var data = [data];
+        $table.bootstrapTable({data:data});
+      }
+
     });
 
   });
@@ -136,17 +186,46 @@
 
 <!-- Script de ajax para submeter email via click -->
 <script>
+  var $table = $('#email-table');
   $("#email_button").click(function(event) {
     event.preventDefault();
 
     var $form = $( this ),
           url = $form.attr( 'action' );
 
+          var newData = [];
     $.post( url, {email: $('#email_value').val()}, function( data ) {
       var responseLength = data.Response.length;
       for (var i = 0; i < responseLength; i++) {
-        console.log(data.Response[i]);
+        var myDataClasses = "";
+        var classesLenght = data.Response[i].DataClasses.length;
+        for(var j =0; j < classesLenght;j++)
+        {
+          if(j == (classesLenght-1))
+          {
+            myDataClasses += data.Response[i].DataClasses[j];
+          }
+          else
+          {
+            myDataClasses += data.Response[i].DataClasses[j]+", ";
+          }
+        }
+        newData.push({"Name":data.Response[i].Name,"Domain":data.Response[i].Domain,"BreachDate":data.Response[i].BreachDate,"DataClasses":myDataClasses,"Description":data.Response[i].Description})
       }
+
+      var element = document.getElementById("email_table");
+      if(element.style.display == "none")
+      {
+        document.getElementById("email_table").style.display = "block";
+        $table.bootstrapTable({data:newData});
+      }
+      else{
+        console.log("não ta invisivel");
+        $table.closest('tr').remove();
+        var data = [data];
+        $table.bootstrapTable({data:data});
+      }
+
     });
 
   });
