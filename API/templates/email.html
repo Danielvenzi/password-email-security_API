@@ -21,6 +21,12 @@
         background-color: black;
         background-image: url('https://media.giphy.com/media/rWY9ySfjytitq/giphy.gif');
       }
+      th{
+        color:#33990D;
+      }
+      tr{
+        color:#33990D;
+      }
 /*      h1{
         color: #90ff00;
         font-size: 40px;
@@ -100,7 +106,6 @@
       <div class="col-sm-8 text-left">
         <h1></h1>
         <p></p>
-        <hr>
         <div id="campo" class="card text-center" style="width: 450px;background-color: black; margin-top: 200px;float: none;margin-bottom: 10px;">
           <div class="card-body">
             <h1 class="card-title" style="color: #33990D">Digite seu email:</h1>
@@ -112,10 +117,10 @@
           </div>
         </div>
       </div>
-      <div class="col-sm-2 sidenav">
-          <div class="container" style="background-color: black">
+      <!-- <div class="col-sm-2 sidenav"> -->
+        <div class="container-fluid text-center" style="background-color: black;float: none;margin-bottom: 10px;">
               <div id="email_table" class="container" style="display:none">
-                  <table class="table" id="email-table" data-height="460">
+                  <table class="table table-responsive" id="email-table">
                   <thead>
                       <tr>
                           <th data-field="Name">Nome</th>
