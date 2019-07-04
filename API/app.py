@@ -191,11 +191,11 @@ def password():
         return jsonify({"Status":status_code,"Resposta":"Sua senha foi encontrada {} vezes nas bases de dados vazadas.".format(count)})
 
     except requests.exceptions.ConnectTimeout:
-        return jsonify({"Error":"Tempo de conexão excedida com: {}".format(url)})
+        return jsonify({"Resposta":"Tempo de conexão excedida com: {}".format(url)})
     except requests.exceptions.ConnectionError:
-        return jsonify({"Error":"Erro de conexão com: {}".format(url)})
+        return jsonify({"Resposta":"Erro de conexão com: {}".format(url)})
     except requests.exceptions.SSLError:
-        return jsonify({"Error":"Erro de conexão SSL com: {}".format(url)})
+        return jsonify({"Resposta":"Erro de conexão SSL com: {}".format(url)})
 
     return  jsonify({"Senha":password,"Hash":sha1pwd,"Head":sha1_head,"Tail":sha1_tail})
 
