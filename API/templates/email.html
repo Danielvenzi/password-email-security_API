@@ -112,13 +112,16 @@
             <p class="card-text"></p>
             <form id="email_form" name="email_input" action="/email" method="POST" onsubmit="return validateForm()">
                 <input id="email_value" placeholder="exemplo@exemplo.com" class="form-control" type="text" name="email" value=""><br>
-                <input onclick="return validateForm()" id="email_button" action="/email" class="form-control btn btn-default" style="color:black;background-color:#33990D" type="submit" value="Enviar">
+                <input onclick="return validateForm()" id="email_button" action="/email" class="form-control btn btn-default" style="color:black;background-color:#33990D;display:block" type="submit" value="Enviar">
+                <button id="refresh_button" href="/emailpage" class="form-control btn btn-default" style="color:black;background-color:#33990D;display:none"  value="Fazer nova pesquisa">Fazer nova pesquisa</button>
+                <!-- <button id="report_button" href="/emailpage" class="form-control btn btn-default" style="color:black;background-color:#33990D;display:none"  value="Fazer nova pesquisa">Fazer nova pesquisa</button> -->
+                <button id="report_button" href='report-download' download="report.pdf" class="form-control btn btn-default" style="color:black;background-color:#33990D;display:none">Gerar relatório</button>
             </form>
           </div>
         </div>
       </div>
       <!-- <div class="col-sm-2 sidenav"> -->
-        <div class="container-fluid text-center" style="background-color: black;float: none;margin-bottom: 10px;">
+        <div id="table-div" class="container-fluid text-center" style="background-color: black;float: none;margin-bottom: 10px;">
               <div id="email_table" style="display:none">
                   <table class="table table-responsive" id="email-table">
                   <thead>
@@ -144,7 +147,9 @@
 
 <!-- Script de ajax para submeter email via enter -->
 <script type='text/javascript'>
+  outData = {};
   var $table = $('#email-table');
+  var $email = $('#')
   $("#email_form").submit(function(event) {
     event.preventDefault();
 
@@ -153,6 +158,7 @@
 
     var newData = [];
     $.post( url, {email: $('#email_value').val()}, function( data ) {
+      if(data.Status == "200"){
       var responseLength = data.Response.length;
       for (var i = 0; i < responseLength; i++) {
         var myDataClasses = "";
@@ -174,6 +180,41 @@
       var element = document.getElementById("email_table");
       if(element.style.display == "none")
       {
+        document.getElementById("refresh_button").style.display = "block";
+        // document.getElementById("report_button").style.display = "block";
+        document.getElementById("email_button").style.display = "none"; 
+        document.getElementById("email_table").style.display = "block";
+        $table.bootstrapTable({data:newData});
+
+        var reportData = data;
+        var url = 'report';
+        $.post(url, reportData, function( data ) {});
+        window.location = 'report-download';
+
+      }
+      else{
+        console.log("não ta invisivel");
+        $table.closest('tr').remove();
+        var data = [data];
+        $table.bootstrapTable({data:data});
+      }
+    }
+    else{
+      var element = document.getElementById("email_table");
+      if(element.style.display == "none")
+      {
+        newData.push(data);
+
+        // class="container-fluid text-center" style="width: 450px;background-color: black;float: none;margin-bottom: 10px;"
+        document.getElementById("table-div").className = "container-fluid text-center";
+        document.getElementById("table-div").style.width = "585px";
+        document.getElementById("table-div").style.backgroundColor = "black";
+        document.getElementById("table-div").style.float= "none";
+        document.getElementById("table-div").style.marginBottom = "10px";
+
+        document.getElementById("refresh_button").style.display = "block";
+        // document.getElementById("report_button").style.display = "block";
+        document.getElementById("email_button").style.display = "none"; 
         document.getElementById("email_table").style.display = "block";
         $table.bootstrapTable({data:newData});
       }
@@ -183,14 +224,17 @@
         var data = [data];
         $table.bootstrapTable({data:data});
       }
-
+    }
     });
 
   });
+  console.log(outData);
+
 </script>
 
 <!-- Script de ajax para submeter email via click -->
 <script>
+  outData = {};
   var $table = $('#email-table');
   $("#email_button").click(function(event) {
     event.preventDefault();
@@ -198,8 +242,9 @@
     var $form = $( this ),
           url = $form.attr( 'action' );
 
-          var newData = [];
+    var newData = [];
     $.post( url, {email: $('#email_value').val()}, function( data ) {
+      if(data.Status == "200"){
       var responseLength = data.Response.length;
       for (var i = 0; i < responseLength; i++) {
         var myDataClasses = "";
@@ -221,6 +266,57 @@
       var element = document.getElementById("email_table");
       if(element.style.display == "none")
       {
+        document.getElementById("refresh_button").style.display = "block";
+        // document.getElementById("report_button").style.display = "block";
+        document.getElementById("email_button").style.display = "none"; 
+        document.getElementById("email_table").style.display = "block";
+        $table.bootstrapTable({data:newData});
+
+        var reportData = JSON.stringify(data);
+        var url = 'report';
+        $.post(url, reportData, function( data ) {
+          console.log(data);
+        });
+
+        window.location = 'report-download';
+
+        // $.ajax('entry', {
+        //             url='type url here',
+        //             type: 'POST',
+        //             dataType='json',
+        //             data: JSON.stringify(json),
+        //             contentType: 'application/json',
+        //             success: function(data, textStatus, jqXHR){
+        //                 console.log(data);
+        //             },
+        //             error: function(jqXHR, textStatus, errorThrown){
+        //                 console.log(errorThrown);
+        //             }
+        //         });
+
+      }
+      else{
+        console.log("não ta invisivel");
+        $table.closest('tr').remove();
+        var data = [data];
+        $table.bootstrapTable({data:data});
+      }
+    }
+    else{
+      var element = document.getElementById("email_table");
+      if(element.style.display == "none")
+      {
+        newData.push(data);
+
+        document.getElementById("table-div").className = "container-fluid text-center";
+        document.getElementById("table-div").style.width = "585px";
+        document.getElementById("table-div").style.backgroundColor = "black";
+        document.getElementById("table-div").style.float= "none";
+        document.getElementById("table-div").style.marginBottom = "10px";
+
+        document.getElementById("refresh_button").style.display = "block";
+        // document.getElementById("report_button").style.display = "block";
+        document.getElementById("email_button").style.display = "none"; 
         document.getElementById("email_table").style.display = "block";
         $table.bootstrapTable({data:newData});
       }
@@ -230,10 +326,13 @@
         var data = [data];
         $table.bootstrapTable({data:data});
       }
-
+    }
     });
+    
 
   });
+  console.log("saiu");
+  console.log(outData);
 </script>
 
 </html>
