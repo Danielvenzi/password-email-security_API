@@ -159,6 +159,8 @@ def render_email():
 def password():
     # Pega o campo password do form da página HTML
     password= request.form['password']
+    if password == "":
+        return jsonify({"Response":"Error","Status":"400"}),400
     # Calcula o sha1 da password
     sha1pwd = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
     # Pega os cinco primeiros caracteres da senha em formato sha1
@@ -251,7 +253,7 @@ def generate_report():
     template_json = request.get_json(force=True)
     print(template_json)
 
-    os.system("rm -f ./report.pdf")
+    #os.system("rm -f ./report.pdf")
     pdf = PDF()
     pdf.alias_nb_pages()
     pdf.add_page()
