@@ -2,15 +2,15 @@
 
 Este é um sistema web feito por meio do framework web flask do Python3 que provê uma interface gráfica para o usuário verificar se suas credenciais cosntam como vazadas.
 
-PRA INCIACAR O PROGRAMA CORRETAMENTE EXECUTE O PROGRAMA: setup.py da seguinte maneira:
+Para iniciar o programa corretamente execute o seguinte comando:
 
 	python3 setup.py install
 
-COM ISSO AS DEPENDÊNCIAS: flask, requests e shutil SERÃO INSTALADAS NA SUA MÁQUINA.
+com isso as dependências: flask, requests e shutil serão instaladas na sua máquina.
 
-PARA RODAR O SERVIDOR BASTA EXECUTAR O COMANDO:
+Para inicializar o servidor web do sistema execute o comando:
 	
 	python3 app.py
 
-NOTE QUE É NECESSÁRIO ESTAR DENTRO DA PASTA API PARA ISSO FUNCIONAR.
-EXECUTANDO O COMANDO ACIMA O SERVIDOR ESTARA FUNCIONANDO E PODERÁ SER ACESSADO PELO NAVEGADOR.
+Note que é necessário estar dentro da pasta API para que os comandos acima funcionem.
+Após a execução acesse o sistema pelo navegador por localhost:8080.
